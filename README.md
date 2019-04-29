@@ -1,5 +1,5 @@
 # Project 2
-The goal of this lab is to become familiar with VueJS.
+This project uses Vue.js on the front end and flask on teh backend to create a instagram clone
 
 Remember to always create a virtual environment and install the packages in your requirements file
 
