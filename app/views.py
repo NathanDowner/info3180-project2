@@ -99,9 +99,15 @@ def login():
         password = form.password.data
         
         #Query the database to retrive the recording corresponding to the given username and password
-        user = db.session.query(Users).filter_by(username=username).first()
+        user1 = db.session.query(Users).filter_by(username=username).first()
+        user2 = db.session.query(Users).filter_by(email=username).first()
+
+        if user1 is not None: 
+            user = user1
+        elif user2 is not None:
+            user = user2
         
-        if user is not None and check_password_hash(user.password, password):
+        if (check_password_hash(user.password, password)):
             
             login_user(user)
 
