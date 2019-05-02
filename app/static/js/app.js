@@ -300,7 +300,7 @@ const Explore = Vue.component('explore', {
           <div class="card-header bg-white">
             <p> 
              <span @click="toProfile(post.user.id)" class="clickable"> 
-              <img :src=post.user.profile_photo alt="User profile photo" class="img-size rounded-circle d-inline-block"/>
+              <img :src="post.user.profile_photo" alt="User profile photo" class="img-size rounded-circle d-inline-block"/>
               {{ post.user.username }}
              </span>
             </p>
@@ -344,7 +344,8 @@ const Explore = Vue.component('explore', {
       else{
         if(jsonResponse.hasOwnProperty("posts")){
           if(jsonResponse.posts.length !=0){
-            self.posts = self.getUser(jsonResponse.posts);//TODO user map function
+            self.posts = self.getUsers(jsonResponse.posts);//TODO user map function
+            // self.posts = jsonResponse.posts.map(post => self.getUser(post));
             console.log(self.posts);
           }
           else{
@@ -358,7 +359,7 @@ const Explore = Vue.component('explore', {
     });
   },
   methods: {
-    getUser: function (posts) {
+    getUsers: function (posts) {
       let postLst = [];
       
       posts.forEach(post => {
@@ -382,6 +383,27 @@ const Explore = Vue.component('explore', {
         });
       });
       return postLst;
+    },
+    getUser: function (post) {
+        
+      fetch(`/api/users/${post.user_id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.token}`
+        },
+        credentials: 'same-origin'
+      })
+      .then(resp => resp.json())
+      .then(jsonResp => {
+        post.user = jsonResp.user;
+        console.log(jsonResp.user);
+        return post;
+      })
+      .catch(function (error){
+        console.log(error);
+      });
+      
+      return post;
     },
     like: function(postId, index) {
       let self = this;

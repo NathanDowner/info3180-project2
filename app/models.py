@@ -61,6 +61,7 @@ class Posts(db.Model):
 
     #Relationship between a post and its likes
     likes = db.relationship('Likes', backref='post', passive_deletes=True, lazy=True)
+    comments = db.relationship('Comment', backref='post', passive_deletes=True, lazy=True)
 
     def __init__(self, photo, caption, user_id):
         self.photo = photo
@@ -110,3 +111,16 @@ class Follows(db.Model):
             return unicode(self.id)  # python 2 support
         except NameError:
             return str(self.id) # python 3 support
+
+
+class Comment(db.Model):
+    __tablename__ = "Comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    text = db.Column(db.String(256), nullable=False)
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.now())
+
+    def __init__(self, user_id, text):
+        self.user_id = user_id
+        self.text = text
