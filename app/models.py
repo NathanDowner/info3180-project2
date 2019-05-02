@@ -17,9 +17,9 @@ class Users(db.Model):
     joined_on = db.Column(db.DateTime, nullable=False, default=datetime.now())
     
     #Relationships between the a user and its posts and followers
-    posts = db.relationship('Posts', backref='Users', passive_deletes=True, lazy=True)
-    likes = db.relationship('Likes', backref='Users', passive_deletes=True, lazy=True)
-    followers = db.relationship('Follows', backref='Users', passive_deletes=True, lazy=True)
+    posts = db.relationship('Posts', backref='user', passive_deletes=True, lazy=True)
+    likes = db.relationship('Likes', backref='user', passive_deletes=True, lazy=True)
+    followers = db.relationship('Follows', backref='user', passive_deletes=True, lazy=True)
 
     def __init__(self, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.username = username
@@ -60,7 +60,7 @@ class Posts(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
     #Relationship between a post and its likes
-    likes = db.relationship('Likes', backref='Posts', passive_deletes=True, lazy=True)
+    likes = db.relationship('Likes', backref='post', passive_deletes=True, lazy=True)
 
     def __init__(self, photo, caption, user_id):
         self.photo = photo
