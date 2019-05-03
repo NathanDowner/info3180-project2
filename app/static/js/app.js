@@ -295,16 +295,8 @@ const Explore = Vue.component('explore', {
       <div class="col-md-7 ml-5" v-if='valid'>
         <h5> {{ message }} </h5>
       </div>
-      <div class="col-md-7 mb-5 bg-white rounded-lg no-padding mr-auto" v-for="(post, index) in posts">
-        <div class="card rounded-lg border-col">
-          <post-header v-bind:user_id="post.user_id"></post-header>
-          <img :src=post.photo class="card-img-top" alt="Picture posted by the user">
-          <div class="card-body text-muted">
-            <small> {{ post.caption }}</small>
-          </div>
-          <post-footer v-bind:date="post.created_on" v-bind:numLikes="post.likes" v-bind:isAlreadyLiked="post.isLiked" v-bind:postId="post.id"></post-footer>
-        </div>
-      </div>
+      <post v-for="post in posts" v-bind:post="post"></post>
+     
     </div>
   `,
   created: function(){
@@ -428,7 +420,7 @@ const Explore = Vue.component('explore', {
 
 const PostHeader = Vue.component('post-header', {
   template: `
-    <div class="d-flex flex-row justify-content-start align-items-center p-2 bg-white">
+    <div atyle="border-bottom: 1px solid gray" class="d-flex flex-row justify-content-start align-items-center p-2 bg-white">
       <router-link :to="profileUrl">
         <img :src="imgUrl" class="img-size rounded-circle d-inline-block">
         <p class="text-muted font-weight-bold d-inline-block ml-1">{{ username }}</p>
@@ -516,11 +508,15 @@ const PostFooter = Vue.component('post-footer', {
 
 const Post = Vue.component('post', {
   template:`
-    <div>
+    <div class=" card col-md-7 mb-5 bg-white rounded-lg no-padding mr-auto border-col">
       <post-header v-bind:user_id='post.user_id'></post-header>
+      <img :src=post.photo class="card-img-top" alt="Picture posted by the user">
+      <div class="card-body text-muted">
+        <small> {{ post.caption }}</small>
+      </div>
       <post-footer 
         v-bind:date="post.created_on" 
-        v:bind:numLikes="post.likes" 
+        v-bind:numLikes="post.likes" 
         v-bind:isAlreadyLiked="post.isLiked" 
         v-bind:postId="post.id">
       </post-footer>
