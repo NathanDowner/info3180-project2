@@ -202,7 +202,7 @@ const Login = Vue.component('login', {
         <div class="border-top rounded bg-white shadow">
           <form id="loginForm" method="post" @submit.prevent="login" class="col-md-12" style="padding: 15px 15px 30px 15px;">
             <div class="form-group">
-              <label class="font-weight-bold"> Username </label>
+              <label class="font-weight-bold"> Username or Email</label>
               <input type="text" name="username" class="form-control">
             </div>
             <div class="form-group">
@@ -290,12 +290,25 @@ const Explore = Vue.component('explore', {
   template: `
     <div class="row d-flex flex-row-reverse">
       <div class="col-sm-3">
-        <router-link to="/posts/new"><input type="submit" value="New Post" class="btn btn-primary btn-block"></router-link>
+      <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#myModal">
+        New Post
+      </button>
+        <router-link style="display:none;"to="/posts/new"><input type="submit" value="New Post" class="btn btn-primary btn-block"></router-link>
       </div>
       <div class="col-md-7 ml-5" v-if='valid'>
         <h5> {{ message }} </h5>
       </div>
       <post v-for="post in posts" v-bind:post="post"></post>
+      <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <new-post></new-post>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
      
     </div>
   `,
@@ -685,11 +698,11 @@ const User = Vue.component('user', {
   }
 });
 
-const New = Vue.component('new', {
+const NewPost = Vue.component('new-post', {
   template: `
     <div style="display:flex; justify-content: center;">
-      <div style="width: 800px; margin: 0 350px 0 350px;">
-        <h4> New Post </h4>
+      <div style="width: 800px;">
+        <h4 class="p-2"> New Post </h4>
         <div class="border-top rounded bg-white">
           <div v-if='error'>
             {{ message }}
@@ -729,6 +742,7 @@ const New = Vue.component('new', {
       })
       .then(function (jsonResponse){
         console.log(jsonResponse);
+        router.go(0);
         router.push('/explore');
       })
       .catch(function (error){
@@ -760,7 +774,7 @@ const router = new VueRouter({
     { path: '/logout', component: Logout},
     { path: '/explore', component: Explore},
     { path: '/users/:user_id', name:'user', component: User},
-    { path: '/posts/new', component: New},
+    { path: '/posts/new', component: NewPost},
     // This is a catch all route in case none of the above matches
     {path: "*", component: NotFound}
   ]
