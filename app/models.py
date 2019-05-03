@@ -61,7 +61,7 @@ class Posts(db.Model):
 
     #Relationship between a post and its likes
     likes = db.relationship('Likes', backref='post', passive_deletes=True, lazy=True)
-    comments = db.relationship('Comment', backref='post', passive_deletes=True, lazy=True)
+    # comments = db.relationship('Comment', backref='post', passive_deletes=True, lazy=True)
 
     def __init__(self, photo, caption, user_id):
         self.photo = photo

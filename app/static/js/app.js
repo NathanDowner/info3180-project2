@@ -295,29 +295,14 @@ const Explore = Vue.component('explore', {
       <div class="col-md-7 ml-5" v-if='valid'>
         <h5> {{ message }} </h5>
       </div>
-      <div class="col-md-7 ml-5 mb-5 bg-white rounded-lg no-padding mr-auto" v-for="(post, index) in posts">
+      <div class="col-md-7 mb-5 bg-white rounded-lg no-padding mr-auto" v-for="(post, index) in posts">
         <div class="card rounded-lg border-col">
-          <div class="card-header bg-white">
-            <p> 
-             <span @click="toProfile(post.user.id)" class="clickable"> 
-              <img :src="post.user.profile_photo" alt="User profile photo" class="img-size rounded-circle d-inline-block"/>
-              {{ post.user.username }}
-             </span>
-            </p>
-          </div>
+          <post-header v-bind:user_id="post.user_id"></post-header>
           <img :src=post.photo class="card-img-top" alt="Picture posted by the user">
           <div class="card-body text-muted">
             <small> {{ post.caption }}</small>
           </div>
-          <div class="card-footer bg-white border-0">
-            <small class="clickable" v-on:click="like(post.id, index)">
-              <span v-if="post.isLiked"><i class='fas fa-heart d-inline-block text-danger'></i></span>
-              <span v-else><i class="far fa-heart d-inline-block"></i></span>
-              {{ post.likes }}
-              Likes
-            </small>
-            <small>{{ post.created_on }}</small>
-          </div>
+          <post-footer v-bind:date="post.created_on" v-bind:numLikes="post.likes" v-bind:isAlreadyLiked="post.isLiked" v-bind:postId="post.id"></post-footer>
         </div>
       </div>
     </div>
@@ -439,6 +424,116 @@ const Explore = Vue.component('explore', {
       id: localStorage.current_user
     };
   }
+});
+
+const PostHeader = Vue.component('post-header', {
+  template: `
+    <div class="d-flex flex-row justify-content-start align-items-center p-2 bg-white">
+      <router-link :to="profileUrl">
+        <img :src="imgUrl" class="img-size rounded-circle d-inline-block">
+        <p class="text-muted font-weight-bold d-inline-block ml-1">{{ username }}</p>
+      </router-link>
+    </div>
+  `,
+  props: ['user_id'],
+  data: function() {
+    return {
+      username: '',
+      imgUrl: ''
+    }
+  },
+  computed: {
+    profileUrl: function () {
+      let self = this;
+      return 'users/' + self.user_id;
+    }
+  },
+  created: function() {
+    let self = this;
+
+    fetch(`/api/users/${self.user_id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.token}`
+      },
+      credentials: 'same-origin'
+    }).then(resp => resp.json()).then(data => {
+      // console.log(data.user.username);
+      self.username = data.user.username;
+      self.imgUrl = data.user.profile_photo;
+    })
+  },
+  methods: {}
+});
+
+const PostFooter = Vue.component('post-footer', {
+  template: `
+    <div class="d-flex flex-row justify-content-between p-3 bg-white">
+      <span class="font-weight-bold text-muted">
+        <span @click="likePost">
+          <i v-if="isLiked" class='fas fa-heart d-inline-block text-danger'></i>
+          <i v-else class='far fa-heart d-inline-block'></i>
+        </span>
+        {{ likes }} Likes
+      </span>
+      <span class="font-weight-bold text-muted">{{ date }}</span>
+    </div>
+  `,
+  props: {
+    date: String,
+    numLikes: Number,
+    isAlreadyLiked: Boolean,
+    postId: Number
+  },
+  data: function () {
+    return {
+      isLiked: this.isAlreadyLiked,
+      likes: this.numLikes
+    }
+  },
+  created: function() {},
+  methods: {
+    likePost: function() {
+      let self = this;
+      fetch(`/api/posts/${self.postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.token}`,
+          'X-CSRFToken': token
+        },
+        credentials: 'same-origin'
+      }).then(resp => resp.json()).then(data =>{
+        if (data.hasOwnProperty("message")) {
+          self.isLiked = true;
+          self.likes ++;
+        } else {
+          console.log(data.error);
+        }
+      }).catch(err => console.log(err));
+    }
+  }
+});
+
+const Post = Vue.component('post', {
+  template:`
+    <div>
+      <post-header v-bind:user_id='post.user_id'></post-header>
+      <post-footer 
+        v-bind:date="post.created_on" 
+        v:bind:numLikes="post.likes" 
+        v-bind:isAlreadyLiked="post.isLiked" 
+        v-bind:postId="post.id">
+      </post-footer>
+    </div>
+  `,
+  props: ['post'],
+  data: function() {
+    return {
+
+    }
+  },
+  created: function(){},
+  methods: {}
 });
 
 const User = Vue.component('user', {
